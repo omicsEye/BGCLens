@@ -1,11 +1,11 @@
-# seqSight #
+# BGCLens #
 
-**seqSight** is a tool to jointly profile microbial strains, genes, and biosynthetic gene clusters from metagenomics data; it is designed to provided maximum utility to the user by incorporating a number of analysis modules for the quantification of not only bacterial strains but also gene families and biosynthetic gene clusters. seqSight also incorporates quality control modules and visualization tools.
+**BGCLens** (previously seqSight)is a tool to jointly profile microbial strains, genes, and biosynthetic gene clusters from metagenomics data; it is designed to provided maximum utility to the user by incorporating a number of analysis modules for the quantification of not only bacterial strains but also gene families and biosynthetic gene clusters. BGCLens also incorporates quality control modules and visualization tools.
  
 ---
 
 # Citation: #
- Xinyang Zhang, Tyson Dawson, Keith A. Crandall, Ali Rahnavard (2023+), **seqSight: jointly profile microbial strains, genes, and biosynthetic gene clusters from metagenomics data**, https://github.com/omicsEye/seqSight
+ Xinyang Zhang, Tyson Dawson, Keith A. Crandall, Ali Rahnavard (2023+), **BGCLens: jointly profile microbial strains, genes, and biosynthetic gene clusters from metagenomics data**, https://github.com/omicsEye/BGCLens
 
 # Attention # 
 ----
@@ -13,19 +13,19 @@
 Please check our [omicsEye Support Forum](https://forum.omicsEye.org) for common questions before open issue thread there.
 
 ----
-# seqSight user manual
+# BGCLens user manual
 
 ## Contents ##
 * [Features](#features)
-* [seqSight](#seqSight)
+* [BGCLens](#BGCLens)
     * [Requirements](#requirements)
     * [Installation](#installation)
-* [Getting started with seqSight](#getting-started-with-seqSight)
-    * [Test seqSight](#test-seqSight)
+* [Getting started with BGCLens](#getting-started-with-BGCLens)
+    * [Test BGCLens](#test-BGCLens)
     * [Options](#options) 
     * [Input](#input)
     * [Output](#output)  
-* [seqSight pipelines](#seqSight-pipelines)
+* [BGCLens pipelines](#BGCLens-pipelines)
    * [Taxonomic profiling](#taxonomic-profiling)
    * [Biosynthetic gene clusters profiling](Biosynthetic-gene-clusters-profiling)
 * [Utilities](#Utilities)
@@ -46,7 +46,7 @@ Please check our [omicsEye Support Forum](https://forum.omicsEye.org) for common
 * [Support](#Support)
 ------------------------------------------------------------------------------------------------------------------------------
 # Features #
-1. Generality: seqSight uses sequence reads as input with filtering and QC.
+1. Generality: BGCLens uses sequence reads as input with filtering and QC.
 
 2. Mapping database
     * Taxonomic Reference Genomes
@@ -56,7 +56,7 @@ Please check our [omicsEye Support Forum](https://forum.omicsEye.org) for common
     * Gene Family Pathway Analysis
  
     
-# seqSight #
+# BGCLens #
 
 ## REQUIREMENTS ##
 * [Matplotlib](http://matplotlib.org/)
@@ -88,22 +88,22 @@ conda 4.12.0
 <span style="color:#fc0335">if not, you must make *conda* available to your system for further steps.</span>
 if you have problems adding conda to PATH, you can find instructions [here](https://docs.anaconda.com/anaconda/user-guide/faq/).
   
-* Third create a new conda environment (let's call it seqSight_env) with the following command:
+* Third create a new conda environment (let's call it BGCLens_env) with the following command:
 ```
-conda create --name seqSight_env python=3.9
+conda create --name BGCLens_env python=3.9
 ```
 * Then activate your conda environment:
 ```commandline
-conda activate seqSight_env 
+conda activate BGCLens_env 
 ```
-* Finally, install *seqSight*:
+* Finally, install *BGCLens*:
 
 * You can directly install it from GitHub:
 ```command line
-python -m pip install git+https://github.com/omicsEye/seqSight
+python -m pip install git+https://github.com/omicsEye/BGCLens
 ```
 * or before running the following line you should change your directory to the same directory that you have cloned the 
-  seqSight repo:
+  BGCLens repo:
 ```commandline
 python -m pip install .
 ```
@@ -112,23 +112,23 @@ python -m pip install .
 
 ------------------------------------------------------------------------------------------------------------------------------
 
-# Getting Started with seqSight #
+# Getting Started with BGCLens #
 
-## Test seqSight ##
+## Test BGCLens ##
 
-To test if seqSight is installed correctly, you may run the following command in the terminal:
+To test if BGCLens is installed correctly, you may run the following command in the terminal:
 
 ```
-seqSight -h
+BGCLens -h
 ```
-Which yields seqSight command line options.
+Which yields BGCLens command line options.
 
 
 ## Options ##
 
 ```
-$ seqSight -h
-usage: seqSight [-h] [-U MAP_INPUTREAD] [-1 MAP_INPUTREAD1] [-2 MAP_INPUTREAD2] [-targetRefFiles MAP_TARGETREF] [-filterRefFiles MAP_FILTERREF]
+$ BGCLens -h
+usage: BGCLens [-h] [-U MAP_INPUTREAD] [-1 MAP_INPUTREAD1] [-2 MAP_INPUTREAD2] [-targetRefFiles MAP_TARGETREF] [-filterRefFiles MAP_FILTERREF]
                 [-targetAlignParams MAP_TARGETALIGNPARAMS] [-filterAlignParams MAP_FILTERALIGNPARAMS] [-outDir MAP_OUTDIR] [-outAlign MAP_OUTALIGN] [-indexDir MAP_INDEXDIR]
                 [-targetIndexPrefixes MAP_TARGETINDEX] [-filterIndexPrefixes MAP_FILTERINDEX] [-targetAlignFiles MAP_TARGETALIGN] [-filterAlignFiles MAP_FILTERALIGN]
 
@@ -143,7 +143,7 @@ options:
   -filterRefFiles MAP_FILTERREF
                         Filter Reference Genome Fasta Files Full Path (Comma Separated)
   -targetAlignParams MAP_TARGETALIGNPARAMS
-                        Target Mapping Bowtie2 Parameters (Default: seqSight chosen best parameters)
+                        Target Mapping Bowtie2 Parameters (Default: BGCLens chosen best parameters)
   -filterAlignParams MAP_FILTERALIGNPARAMS
                         Filter Mapping Bowtie2 Parameters (Default: Use the same Target Mapping Bowtie2 parameters)
   -outDir MAP_OUTDIR    Output Directory (Default=. (current directory))
@@ -174,48 +174,48 @@ A list of all options are provided in #options section.
 
 ## Output ##
 ```
-$ seqSight -h
-usage: seqSight [-h] 
+$ BGCLens -h
+usage: BGCLens [-h] 
 
 ```
 
 
-# seqSight piplines # 
+# BGCLens piplines # 
 ## Taxonomic profiling ##
 1. Bayesian Reassignment
 
 
-![tax1](https://github.com/omicsEye/seqSight/blob/main/img/taxProfile1.png)
+![tax1](https://github.com/omicsEye/BGCLens/blob/main/img/taxProfile1.png)
 
 2. Taxonomic profiling
 
 
-![tax2](https://github.com/omicsEye/seqSight/blob/main/img/taxProfile2.png)
+![tax2](https://github.com/omicsEye/BGCLens/blob/main/img/taxProfile2.png)
 
 
 3. Visualization
 
 
-![tax3](https://github.com/omicsEye/seqSight/blob/main/img/taxProfile3.png)
+![tax3](https://github.com/omicsEye/BGCLens/blob/main/img/taxProfile3.png)
 
 ## Utilities ##
-seqSight's repository features utility scripts to help in the manipulation of sample output and its visualization. These scripts can be found under the utils folder in the seqSight directory.
+BGCLens's repository features utility scripts to help in the manipulation of sample output and its visualization. These scripts can be found under the utils folder in the BGCLens directory.
 ### Merge Tables ###
-The script merge_seqSight_tables.py allows to combine seqSight output from several samples to be merged into one table Bugs (rows) vs Samples (columns) with the table enlisting the relative normalized abundances per sample per bug.
+The script merge_BGCLens_tables.py allows to combine BGCLens output from several samples to be merged into one table Bugs (rows) vs Samples (columns) with the table enlisting the relative normalized abundances per sample per bug.
 
 ```
-merge_seqSight_tables.py [path_of_folder_contains_outputs] > output/merged_abundance_table.txt
+merge_BGCLens_tables.py [path_of_folder_contains_outputs] > output/merged_abundance_table.txt
 ```
 
 
 
 
 ## Visulization Demo ##
-1. Go to the seqSight/Notebooks, download FiveTargetNum.tsv, FiveTargetReads.tsv and stackedplot.ipynb.
-2. FiveTargetNum.tsv and FiveTargetReads.tsv are two output files that generated from seqSight.
+1. Go to the BGCLens/Notebooks, download FiveTargetNum.tsv, FiveTargetReads.tsv and stackedplot.ipynb.
+2. FiveTargetNum.tsv and FiveTargetReads.tsv are two output files that generated from BGCLens.
 3. Run the code either on the google colab or in your loacl environment.
 4. The stacked bar plot show the composition distribution and their corresponding reads.
 5. The final look could be liked the following:
-![stacked plot](https://github.com/omicsEye/seqSight/blob/main/Notebooks/stackedplot.png)
+![stacked plot](https://github.com/omicsEye/BGCLens/blob/main/Notebooks/stackedplot.png)
 
-![stacked plot](https://github.com/omicsEye/seqSight/blob/main/Notebooks/BGCAbundance.png)
+![stacked plot](https://github.com/omicsEye/BGCLens/blob/main/Notebooks/BGCAbundance.png)
