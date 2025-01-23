@@ -354,7 +354,7 @@ def seqSight_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, out
     (bestHitFinalReads, bestHitFinal, level1Final, level2Final) = \
         seqSightReport.computeBestHit(U, NU, genomes, reads)
     # finalReport = output + os.sep + expTag + '-' + ali_format + '-report.tsv'
-    finalReport = output + os.sep + "seqSight/Test/TestData /TestRefactor" + '-' + ali_format + '-report.tsv'
+    finalReport = output + os.sep + "seqSight/Test/TestData/TestRefactor" + '-' + ali_format + '-report.tsv'
 
     print("finalReport", finalReport)
     header = ['Genome', 'Final Guess', 'Final Best Hit', 'Final Best Hit Read Numbers', \
