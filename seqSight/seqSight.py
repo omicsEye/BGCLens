@@ -218,7 +218,7 @@ def main():
                                   piPrior=args.id_piPrior,
                                   thetaPrior=args.id_thetaPrior,
                                   noCutOff=args.id_nocutoff,
-                                  verbose=True,
+                                  verbose=False,
                                   emEpsilon=args.id_emEpsilon,
                                   output=args.id_reportDir,
                                   filename=args.id_filename)
