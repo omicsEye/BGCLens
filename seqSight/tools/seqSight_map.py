@@ -89,9 +89,13 @@ def processseqSightMap(seqSightMapOptions):
         if seqSightMapOptions.verbose:
             print("Creating bowtie2 alignment: " + bowtie2Options.outAlignFile)
         bowtie2Wrap.run_bowtie2(bowtie2Options)
-        procseqSightMapOptions.targetAlignFiles.append(procseqSightMapOptions.outDir + os.sep +
-                                                       bowtie2Options.outAlignFile)
-        print("procseqSightMapOptions.outDir + os.sep + bowtie2Options.outAlignFile",procseqSightMapOptions.outDir + os.sep + bowtie2Options.outAlignFile)
+        # procseqSightMapOptions.targetAlignFiles.append(bowtie2Options.outAlignFile)
+        # previous
+        # procseqSightMapOptions.targetAlignFiles.append(procseqSightMapOptions.outDir + os.sep +
+        #                                                bowtie2Options.outAlignFile)
+        # latest
+        procseqSightMapOptions.targetAlignFiles.append(bowtie2Options.outAlignFile)
+        # print("procseqSightMapOptions.outDir + os.sep + bowtie2Options.outAlignFile",procseqSightMapOptions.outDir + os.sep + bowtie2Options.outAlignFile)
 
     # Appending the Alignment files and Filtering
     if len(procseqSightMapOptions.targetAlignFiles) > 1:
