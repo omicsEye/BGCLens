@@ -216,7 +216,9 @@ def main():
     #                               noCutOff=args.id_nocutoff,
     #                               verbose=True,
     #                               emEpsilon=args.id_emEpsilon,
-    #                               reportDir=args.id_reportDir)
+    #                               output=args.id_reportDir)
+
+    #                               output=args.map_outdir,
 
     # seqSight_id.seqSight_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, output, maxIter,
     # upalign, piPrior, thetaPrior, noCutOff, verbose, emEpsilon=0.01)
