@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 """
-seqSight: seqSight_databases module
+BGCLens: BGCLens_databases module
 Download databases an update config settings
 Dependencies: None
-To Run: seqSight_databases --download <database> <build> <install_location>
+To Run: BGCLens_databases --download <database> <build> <install_location>
 Copyright (c) 2014 Harvard School of Public Health
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -133,7 +133,7 @@ def parse_arguments(args):
     Parse the arguments from the user
     """
     parser = argparse.ArgumentParser(
-        description="seqSight Databases\n",
+        description="BGCLens Databases\n",
         formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
         "--available",
@@ -192,7 +192,7 @@ def main():
     if args.available or not args.download:
         # print the available databases
         current_config_items = config.read_user_edit_config_file()
-        print("seqSight Databases ( database : build = location )")
+        print("BGCLens Databases ( database : build = location )")
         for database in current_downloads:
             for build, location in current_downloads[database].items():
                 print(database + " : " + build + " = " + location)

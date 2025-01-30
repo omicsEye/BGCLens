@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# Gets alignment file (currently support sam or BLAST-m8 format (.bl8)) and runs EM algorithm.
+# Outputs the pathogens rank in the sample as a report that can be opened in Excel.
+# Optionally outputs an updated alignment file (sam/bl8)
 import csv
 import math
 import os
@@ -6,10 +9,12 @@ import re
 import sys
 import argparse
 
-from seqSight.tools.seqSightReport import seqSightReport
-from seqSight.tools.utils import samUtils, seqSightUtils
+from BGCLens.tools.BGCLensReport import BGCLensReport
+from BGCLens.tools.utils import samUtils, samUtils
+from time import time
 
 
+# ===========================================================
 def conv_align2GRmat(aliDfile, pScoreCutoff, aliFormat):
     in1 = open(aliDfile, 'r')
     U = {}
@@ -58,6 +63,7 @@ def conv_align2GRmat(aliDfile, pScoreCutoff, aliFormat):
         if ((minScore == None) or (pScore < minScore)):
             minScore = pScore
 
+
         gIdx = h_refId.get(refId, -1)
         if gIdx == -1:
             gIdx = gCnt
@@ -103,301 +109,210 @@ def conv_align2GRmat(aliDfile, pScoreCutoff, aliFormat):
     return U, NU, genomes, read
 
 
-def initialize_probabilities(genomes):
-    """
-    Initialize the probabilities for the EM algorithm.
+# ===========================================================
+# Entry function to BGCLensID
+# Does the reassignment and generates a tsv file report
+def BGCLens_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, output, maxIter,
+                      upalign, piPrior, thetaPrior, noCutOff, verbose, emEpsilon=0.01, filename="Report"):
+    print("You are in BGCLens_reassign")
 
-    Parameters:
-    genomes (list): List of genomes.
+    if float(os.stat(ali_file).st_size) < 1.0:
+        print('the alignment file [%s] is empty.' % ali_file)
+        sys.exit(1)
 
-    Returns:
-    tuple: Tuple containing initialized probabilities for pi and theta.
-    """
-    G = len(genomes)
-    initial_value = 1. / G
-    pi = [initial_value for _ in genomes]
-    theta = [initial_value for _ in genomes]
-    return pi, theta
+    if ali_format == 'gnu-sam':
+        aliFormat = 0
+        if verbose:
+            print("parsing gnu-sam file/likelihood score/reads and mapped genomes...")
+    elif ali_format == 'sam':  # standard sam
+        aliFormat = 1
+        if verbose:
+            print("parsing sam file/likelihood score/reads and mapped genomes...")
+    elif ali_format == 'bl8':  # blat m8 format
+        aliFormat = 2
+        if verbose:
+            print("parsing bl8 file/likelihood score/reads and mapped genomes...")
+    else:
+        print("unknown alignment format file...")
+        return
+    (U, NU, genomes, reads) = conv_align2GRmat(ali_file, scoreCutoff, aliFormat)
 
-
-def update_pi(pisum, priorWeight, total_weight, piPrior, num_genomes):
-    """
-    Update the pi values in the M-step of the EM algorithm.
-
-    Parameters:
-    pisum (list): Summation of theta values for each genome.
-    total_weight (float): Total weight of reads.
-    piPrior (float): Prior for the pi parameter.
-    num_genomes (int): Number of genomes.
-
-    Returns:
-    list: Updated pi values.
-    """
-    pip = piPrior * priorWeight
-    # pi = [(k + pip) / (total_weight + pip * num_genomes) for k in pisum]
-    pi = [(k + pip) / (total_weight + pip * num_genomes) for k in pisum]  ## update pi
-    return pi
-
-
-def update_theta(thetasum, total_weight, thetaPrior, num_genomes):
-    """
-    Update the theta values in the M-step of the EM algorithm.
-
-    Parameters:
-    thetasum (list): Summation of pi values for each genome.
-    total_weight (float): Total weight of reads.
-    thetaPrior (float): Prior for the theta parameter.
-    num_genomes (int): Number of genomes.
-
-    Returns:
-    list: Updated theta values.
-    """
-    thetap = thetaPrior * total_weight
-    theta = [(k + thetap) / (total_weight + thetap * num_genomes) for k in thetasum]
-    return theta
-
-
-def has_converged(current_pi, previous_pi, emEpsilon, verbose):
-    """
-    Check if the EM algorithm has converged based on the change in pi values.
-
-    Parameters:
-    current_pi (list): Current pi values after the latest iteration.
-    previous_pi (list): Pi values from the previous iteration.
-    emEpsilon (float): Convergence threshold.
-    verbose (bool): Flag to enable verbose logging.
-
-    Returns:
-    bool: True if the algorithm has converged, False otherwise.
-    """
-    print(current_pi)
-    print(previous_pi)
-    # Calculate the total change in pi values between iterations
-    total_change = sum(abs(current - previous) for current, previous in zip(current_pi, previous_pi))
-
-    # Log the change if verbose mode is enabled
-    if verbose:
-        print(f"[Iteration]: Total change in pi values: {total_change}")
-
-    # Check if the change is below the threshold
-    return total_change <= emEpsilon
-
-
-def seqSight_em(U, NU, genomes, maxIter, emEpsilon, verbose, piPrior, thetaPrior):
-    """
-    Perform the Expectation-Maximization algorithm on the given data.
-
-    Parameters:
-    U (dict): Dictionary containing unique reads data.
-    NU (dict): Dictionary containing non-unique reads data.
-    genomes (list): List of genomes.
-    maxIter (int): Maximum number of iterations.
-    emEpsilon (float): Convergence threshold.
-    verbose (bool): Verbose output flag.
-    piPrior (float): Prior for pi parameter.
-    thetaPrior (float): Prior for theta parameter.
-
-    Returns:
-    tuple: Tuple containing initial and final pi and theta values, and updated NU.
-    """
-    # Initialize probabilities
-    pi, theta = initialize_probabilities(genomes)
-    initPi = pi
-
-    # Get weights for unique and non-unique reads
-    Uweights, Utotal = get_weights(U, weight_index=1)
-    NUweights, NUtotal = get_weights(NU, weight_index=3)
-
-    priorWeight = max(max(Uweights), max(NUweights))
-    pisum0 = calculate_pisum0(U, genomes)
-    print("pisum0", pisum0)  # [5.376234283632271e+43, 0, 0]
-    lenNU = len(NU)
-    if lenNU == 0:
-        lenNU = 1
-
-    for iteration in range(maxIter):
-        pi_old = pi
-        thetasum = [0 for _ in genomes]
-
-        # E-Step: Update NU and calculate thetasum
-        thetasum = perform_e_step(NU, pi, theta, thetasum)
-
-        # M-Step: Update pi and theta
-        pisum = [thetasum[k] + pisum0[k] for k in range(len(thetasum))]  ### calculate tally for pi
-        pi = update_pi(pisum, priorWeight, Utotal + NUtotal, piPrior, len(genomes))
-        theta = update_theta(thetasum, NUtotal, thetaPrior, len(genomes))
-
-        # Check for convergence
-        cutoff = 0.0
-        for k in range(len(pi)):
-            cutoff += abs(pi_old[k] - pi[k])
-        if (cutoff <= emEpsilon or lenNU == 1):
-            break
-        # if has_converged(pi, iteration, emEpsilon, verbose):
-        #     break
-
-    return initPi, pi, theta, NU
-
-
-def get_weights(reads_dict, weight_index):
-    """
-    Get weights from a dictionary of reads.
-
-    Parameters:
-    reads_dict (dict): Dictionary of reads.
-    weight_index (int): Index for the weight in the reads data.
-
-    Returns:
-    tuple: Tuple containing the list of weights and the total weight.
-    """
-    weights = [read[weight_index] for read in reads_dict.values() if read]
-    total_weight = sum(weights)
-    return weights, total_weight
-
-
-def calculate_pisum0(U, genomes):
-    """
-    Calculate the initial summation of pi values for unique reads.
-
-    Parameters:
-    U (dict): Dictionary containing unique reads data.
-
-    Returns:
-    list: List of summed pi values for each genome.
-    """
-    pisum0 = [0 for _ in genomes]
-    for read in U.values():
-        pisum0[read[0]] += read[1]
-    return pisum0
-
-
-def perform_e_step(NU, pi, theta, thetasum):
-    """
-    Perform the E-step of the EM algorithm.
-
-    Parameters:
-    NU (dict): Dictionary containing non-unique reads data.
-    pi (list): List of current pi values.
-    theta (list): List of current theta values.
-    thetasum (list): List to accumulate theta
-    Returns:
-    list: Updated thetasum after the E-step.
-    """
-    print("pi", pi)
-    for j in NU:  # for each non-unique read, j
-        z = NU[j]
-        genome_indices = z[0]  # a set of any genome mapping with j
-        print("genome_indices", genome_indices)
-        pitmp = [pi[k] for k in genome_indices]  # relevant pis for the read
-        print("pitmp", pitmp)
-        thetatmp = [theta[k] for k in genome_indices]  # relevant thetas for the read
-        xtmp = [pitmp[k] * thetatmp[k] * z[1][k] for k in range(len(genome_indices))]
-        xsum = sum(xtmp)
-        xnorm = [k / xsum if xsum != 0 else 0.0 for k in xtmp]  # normalized new xs
-
-        NU[j][2] = xnorm  # update x in NU
-
-        for idx, genome_idx in enumerate(genome_indices):
-            thetasum[genome_idx] += xnorm[idx] * NU[j][3]  # weighted tally for theta
-    print("thetasum",thetasum) #thetasum [8.064351425448407e+43, 9.40311461505841e+19, 9.40311461505841e+19]
-
-
-    return thetasum
-
-
-def seqSight_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, output, maxIter,
-                      upalign, piPrior, thetaPrior, noCutOff, verbose, emEpsilon=0.01):
-    """
-    Reassigns sequences using the EM algorithm and generates a report.
-
-    Parameters:
-    out_matrix (bool): Whether to output the matrix.
-    scoreCutoff (float): Score cutoff for alignment.
-    expTag (str): Tag for the experiment.
-    ali_format (str): Format of the alignment file.
-    ali_file (str): Path to the alignment file.
-    output (str): Output directory path.
-    maxIter (int): Maximum iterations for the EM algorithm.
-    upalign (bool): Whether to update the alignment.
-    piPrior (float): Prior value for pi in the EM algorithm.
-    thetaPrior (float): Prior value for theta in the EM algorithm.
-    noCutOff (bool): If True, no cutoff will be applied in reporting.
-    verbose (bool): Verbose output flag.
-    emEpsilon (float): Convergence epsilon for the EM algorithm.
-
-    Returns:
-    tuple: A tuple containing various outputs including the final report.
-    """
-    validate_alignment_file(ali_file)
-    aliFormat = determine_alignment_format(ali_format, verbose)
-    U, NU, genomes, reads = conv_align2GRmat(ali_file, scoreCutoff, aliFormat)
     print("U", U)
     print("NU", NU)
     print("genomes", genomes)
     print("reads", reads)
+
     nG = len(genomes)
     nR = len(reads)
-
     if verbose:
-        print("Starting EM iteration...")
-        print(f"(Genomes, Reads) = {len(genomes)}x{len(reads)}")
+        print("EM iteration...")
+        print("(Genomes,Reads)=%dx%d" % (nG, nR))
         print("Delta Change:")
 
     if out_matrix:
-        initial_align_output(genomes, reads, U, NU, expTag, ali_file, output)
+        if verbose:
+            print("writing initial alignment ...")
+        # print("genomes",genomes)
+        out_initial_align_matrix(genomes, reads, U, NU, expTag, ali_file, output)
 
     (bestHitInitialReads, bestHitInitial, level1Initial, level2Initial) = \
-        seqSightReport.computeBestHit(U, NU, genomes, reads)
+        BGCLensReport.computeBestHit(U, NU, genomes, reads)
 
-    initPi, pi, _, NU = seqSight_em(U, NU, genomes, maxIter, emEpsilon, verbose, piPrior, thetaPrior)
-
-    (bestHitFinalReads, bestHitFinal, level1Final, level2Final) = \
-        seqSightReport.computeBestHit(U, NU, genomes, reads)
-    # finalReport = output + os.sep + expTag + '-' + ali_format + '-report.tsv'
-    finalReport = output + os.sep + "seqSight/Test/TestData/TestRefactor" + '-' + ali_format + '-report232333333.tsv'
-
-    print("finalReport", finalReport)
-    header = ['Genome', 'Final Guess', 'Final Best Hit', 'Final Best Hit Read Numbers', \
-              'Final High Confidence Hits', 'Final Low Confidence Hits', 'Initial Guess', \
-              'Initial Best Hit', 'Initial Best Hit Read Numbers', \
-              'Initial High Confidence Hits', 'Initial Low Confidence Hits']
-    (x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11) = seqSightReport.write_tsv_report(
-        finalReport, nR, nG, pi, genomes, initPi, bestHitInitial, bestHitInitialReads,
-        bestHitFinal, bestHitFinalReads, level1Initial, level2Initial, level1Final,
-        level2Final, header, noCutOff)
+    (initPi, pi, _, NU) = BGCLens_em(U, NU, genomes, maxIter, emEpsilon, verbose,
+                                        piPrior, thetaPrior)
 
     print("initPi", initPi)
     print("pi", pi)
     print("_", _)
     print("NU", NU)
 
+    tmp = zip(initPi, genomes)
+    tmp = sorted(tmp, reverse=True)  # similar to sort row
+
+    if out_matrix:
+        initialGuess = output + os.sep + expTag + '-initGuess.txt'
+        oFp = open(initialGuess, 'w')
+        csv_writer = csv.writer(oFp, delimiter='\t')
+        csv_writer.writerows(tmp)
+        oFp.close()
+
+    del tmp
+
+    (bestHitFinalReads, bestHitFinal, level1Final, level2Final) = \
+        BGCLensReport.computeBestHit(U, NU, genomes, reads)
+
+    if out_matrix:
+        finalGuess = output + os.sep + expTag + '-finGuess.txt'
+        oFp = open(finalGuess, 'w')
+        tmp = zip(pi, genomes)
+        tmp = sorted(tmp, reverse=True)
+        csv_writer = csv.writer(oFp, delimiter='\t')
+        csv_writer.writerows(tmp)
+        oFp.close()
+
+    finalReport = output + os.sep + filename + expTag + '-' + ali_format + '-report.tsv'
+    header = ['Genome', 'Final Guess', 'Final Best Hit', 'Final Best Hit Read Numbers', \
+              'Final High Confidence Hits', 'Final Low Confidence Hits', 'Initial Guess', \
+              'Initial Best Hit', 'Initial Best Hit Read Numbers', \
+              'Initial High Confidence Hits', 'Initial Low Confidence Hits']
+    (x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11) = BGCLensReport.write_tsv_report(
+        finalReport, nR, nG, pi, genomes, initPi, bestHitInitial, bestHitInitialReads,
+        bestHitFinal, bestHitFinalReads, level1Initial, level2Initial, level1Final,
+        level2Final, header, noCutOff)
+
     reAlignfile = ali_file
     if upalign:
         reAlignfile = rewrite_align(U, NU, ali_file, scoreCutoff, aliFormat, output)
 
-    print("x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11", x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11)
-
-    #return report_file, reAlignfile
     return (finalReport, x2, x3, x4, x5, x1, x6, x7, x8, x9, x10, x11, reAlignfile)
 
 
-def validate_alignment_file(ali_file):
-    if os.stat(ali_file).st_size < 1.0:
-        raise ValueError(f'The alignment file {ali_file} is empty.')
+# ===========================================================
+# This is the main EM algorithm
+# ===========================================================
+def BGCLens_em(U, NU, genomes, maxIter, emEpsilon, verbose, piPrior, thetaPrior):
+
+    ## initialize_probabilities
+    G = len(genomes)
+
+    # Initial values
+    pi = [1. / G for _ in genomes]
+    initPi = pi
+    theta = [1. / G for _ in genomes]
 
 
-def determine_alignment_format(ali_format, verbose):
-    format_map = {'gnu-sam': 0, 'sam': 1, 'bl8': 2}
-    if ali_format not in format_map:
-        raise ValueError(f"Unknown alignment format: {ali_format}")
 
-    if verbose:
-        print(f"Parsing {ali_format} file/likelihood score/reads and mapped genomes...")
-    return format_map[ali_format]
+    pisum0 = [0 for _ in genomes]
+
+    Uweights = [U[i][1] for i in U]  # weights for unique reads...
+    maxUweights = 0
+    Utotal = 0
+    if Uweights:
+        maxUweights = max(Uweights)
+        Utotal = sum(Uweights)
+
+    for i in U:
+        pisum0[U[i][0]] += U[i][1]
+
+    print("pisum0", pisum0) #pisum0 [5.376234283632271e+43, 0, 0]
 
 
-def initial_align_output(ref, read, U, NU, expTag, ali_file, output):
-    print("ref", ref)
+    NUweights = [NU[i][3] for i in NU]  # weights for non-unique reads...
+    maxNUweights = 0
+    NUtotal = 0
+    if NUweights:
+        maxNUweights = max(NUweights)
+        NUtotal = sum(NUweights)
+
+    priorWeight = max(maxUweights, maxNUweights)
+
+
+    lenNU = len(NU)
+    if lenNU == 0:
+        lenNU = 1
+
+    for i in range(maxIter):  ## EM iterations--change to convergence
+        pi_old = pi
+        thetasum = [0 for k in genomes]
+
+        # E Step
+
+        for j in NU:  # for each non-uniq read, j
+            z = NU[j]
+            ind = z[0]  # a set of any genome mapping with j
+            print("ind",ind)
+            pitmp = [pi[k] for k in ind]  ### get relevant pis for the read
+            print("pitmp", pitmp)
+            thetatmp = [theta[k] for k in ind]  ### get relevant thetas for the read
+            xtmp = [1. * pitmp[k] * thetatmp[k] * z[1][k] for k in range(len(ind))]  ### Calculate unormalized xs
+            xsum = sum(xtmp)
+            if xsum == 0:
+                xnorm = [0.0 for k in xtmp]  ### Avoiding dividing by 0 at all times
+            else:
+                xnorm = [1. * k / xsum for k in xtmp]  ### Normalize new xs
+
+            NU[j][2] = xnorm  ## Update x in NU
+
+            for k in range(len(ind)):
+                # thetasum[ind[k]] += xnorm[k]   		### Keep running tally for theta
+                thetasum[ind[k]] += xnorm[k] * NU[j][3]  ### Keep weighted running tally for theta
+
+        print("thetasum",thetasum)
+        #[8.064351425448407e+43, 9.40311461505841e+19, 9.40311461505841e+19]
+
+
+        # M step
+        pisum = [thetasum[k] + pisum0[k] for k in range(len(thetasum))]  ### calculate tally for pi
+        pip = piPrior * priorWeight  # pi prior - may be updated later
+        # pi = [(1.*k+pip)/(len(U)+len(NU)+pip*len(pisum)) for k in pisum]  		## update pi
+        # pi = [1.*k/G for k in pisum]  		## update pi
+        totaldiv = Utotal + NUtotal
+        if totaldiv == 0:
+            totaldiv = 1
+        pi = [(1. * k + pip) / (Utotal + NUtotal + pip * len(pisum)) for k in pisum]  ## update pi
+        if (i == 0):
+            initPi = pi
+
+        thetap = thetaPrior * priorWeight  # theta prior - may be updated later
+        NUtotaldiv = NUtotal
+        if NUtotaldiv == 0:
+            NUtotaldiv = 1
+        theta = [(1. * k + thetap) / (NUtotaldiv + thetap * len(thetasum)) for k in thetasum]
+        # theta = [(1.*k+thetap)/(lenNU+thetap*len(thetasum)) for k in thetasum]
+
+        cutoff = 0.0
+        for k in range(len(pi)):
+            cutoff += abs(pi_old[k] - pi[k])
+        if verbose:
+            print("[%d]%g" % (i, cutoff))
+        if (cutoff <= emEpsilon or lenNU == 1):
+            break
+
+    return initPi, pi, theta, NU
+
+
+def out_initial_align_matrix(ref, read, U, NU, expTag, ali_file, output):
+    print("ref",ref)
     genomeId = output + os.sep + expTag + '-genomeId.txt'
     oFp = open(genomeId, 'w')
     csv_writer = csv.writer(oFp, delimiter='\n')
@@ -406,14 +321,16 @@ def initial_align_output(ref, read, U, NU, expTag, ali_file, output):
 
     readId = output + os.sep + expTag + '-readId.txt'
     oFp = open(readId, 'w')
-    print("read", read)
+    print("read",read)
     csv_writer = csv.writer(oFp, delimiter='\n')
     csv_writer.writerows([read])
     oFp.close()
 
 
+# ===========================================================
+# Generates the updated alignment file with the updated score
 def rewrite_align(U, NU, aliDfile, pScoreCutoff, aliFormat, output):
-    seqSightUtils.ensure_dir(output)
+    BGCLensUtils.ensure_dir(output)
     f = os.path.basename(aliDfile)
     reAlignfile = output + os.sep + 'updated_' + f
 
@@ -513,6 +430,8 @@ def rewrite_align(U, NU, aliDfile, pScoreCutoff, aliFormat, output):
     return reAlignfile
 
 
+# ===========================================================
+# Function to find the updated score after BGCLens reassignment
 def find_updated_score(NU, rIdx, gIdx):
     try:
         index = NU[rIdx][0].index(gIdx);
@@ -557,3 +476,4 @@ def find_entry_score(ln, l, aliFormat, pScoreCutoff):
     # if pScore < 1:
     #	skipFlag = true
     return (pScore, skipFlag)
+

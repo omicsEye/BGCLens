@@ -7,11 +7,11 @@ import argparse
 import warnings
 import os, sys
 
-# seqSightdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# print(seqSightdir)
-# sys.path.insert(0, seqSightdir)
+BGCLensdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print(BGCLensdir)
+sys.path.insert(0, BGCLensdir)
 
-from seqSight.tools import seqSight_map, seqSight_id
+from BGCLens.tools import BGCLens_map, BGCLens_id
 
 
 class StoreAsListAction(argparse.Action):
@@ -19,20 +19,20 @@ class StoreAsListAction(argparse.Action):
         setattr(namespace, self.dest, values.split(','))
 
 
-
-# class testseqSightMapOptions:
+# testcase
+# class testBGCLensMapOptions:
 #     MAX_REF_FILE_SIZE = 4.3e9
 #     verbose = False
-#     outDir = ""
+#     outDir = "/Users/xinyang/Documents/Github"
 #     indexDir = ""
 #     numThreads = 8
-#     outAlignFile = "Users/xinyang/Documents/Github/seqSight/seqSight/Test/TestData/outAlign.sam"
-#     inReadFile = "/Users/xinyang/Documents/Github/seqSight/seqSight/Test/TestData/ex1.fastq"
-#     inReadFilePair1 = ""
-#     inReadFilePair2 = ""
+#     outAlignFile = "NC_000913.sam"
+#     inReadFile = ""
+#     inReadFilePair1 = "/Users/xinyang/Documents/Github/BGCLens/BGCLens/Test/TestData/NC_000913_read1.fq"
+#     inReadFilePair2 = "/Users/xinyang/Documents/Github/BGCLens/BGCLens/Test/TestData/NC_000913_read2.fq"
 #     targetRefFiles = []
 #     filterRefFiles = []
-#     targetIndexPrefixes = ["Users/xinyang/Documents/Github/seqSight/seqSight/Test/TestData/genomes"]
+#     targetIndexPrefixes = ["/Users/xinyang/Library/CloudStorage/Box-Box/BGC_Learning/bgc_genes_nt"]  #"/Users/xinyang/Documents/Github/BGCLens/BGCLens/Test/TestData/genomes"
 #     filterIndexPrefixes = []
 #     targetAlignFiles = []
 #     filterAlignFiles = []
@@ -60,7 +60,7 @@ def parse_arguments():
                         help='Filter Reference Genome Fasta Files Full Path (Comma Separated)')
     parser.add_argument('-targetAlignParams', action='store',
                         dest='map_targetalignparams', default=None, required=False,
-                        help='Target Mapping Bowtie2 Parameters (Default: seqSight chosen best parameters)')
+                        help='Target Mapping Bowtie2 Parameters (Default: BGCLens chosen best parameters)')
     parser.add_argument('-filterAlignParams', action='store',
                         dest='map_filteralignparams', default=None, required=False,
                         help='Filter Mapping Bowtie2 Parameters (Default: Use the same Target Mapping Bowtie2 parameters)')
@@ -92,7 +92,7 @@ def parse_arguments():
                         default=8, type=int,
                         help='Number of threads to use by aligner (bowtie2) if different from default (8)')
     parser.add_argument('-expTag', action='store', default='', dest='map_exp_tag',
-                        help='Experiment Tag added to files generated for identification (Default: seqSightMap)')
+                        help='Experiment Tag added to files generated for identification (Default: BGCLensMap)')
 
     # parser.add_argument('--input', '-i', help="files contains the sequences", type=str, required=True)
     # parser.add_argument('--output', '-o', help="output directory to write teh results", type=str, required=True)
@@ -124,7 +124,7 @@ def parse_arguments():
 
     parser.add_argument('-filename', action='store', default='Report',
                         dest='id_filename', required=False,
-                        help='Relative abundance table name')
+                        help='Relative abundance table name(Default=Report)')
 
     return parser.parse_args()
 
@@ -137,7 +137,7 @@ def main():
     args = parse_arguments()
     print(args)
 
-    class seqSightMapOptions:
+    class BGCLensMapOptions:
         MAX_REF_FILE_SIZE = 4.3e9
         verbose = True
         outDir = args.map_outdir
@@ -184,18 +184,20 @@ def main():
         exp_tag = args.map_exp_tag
 
     #     filterRefFiles = []
-    #     targetIndexPrefixes = ["Users/xinyang/Documents/Github/seqSight/seqSight/Test/TestData/genomes"]
-    #     filterIndexPrefixes = []
-    #     targetAlignFiles = []
-    #     filterAlignFiles = []
+        targetIndexPrefixes = ["Users/xinyang/Documents/Github/BGCLens/BGCLens/Test/TestData/genomes"]
+        filterIndexPrefixes = []
+        targetAlignFiles = []
+        filterAlignFiles = []
     """
     step1 - MAP function;
     Input -  ex1.fastq;
     Output - ex1.sam;
     Tool - bowtie2;
     """
-    print(vars(seqSightMapOptions))
-    outAlignFile_test = seqSight_map.processseqSightMap(seqSightMapOptions)
+
+    # print(vars(BGCLensMapOptions))testBGCLensMapOptions   | BGCLensMapOptions
+    outAlignFile_test = BGCLens_map.processBGCLensMap(BGCLensMapOptions)
+    # print(outAlignFile_test)
     print('MAP done')
     """
      step2 - ID function;
@@ -203,12 +205,13 @@ def main():
      Output - report.tsv;
      Tool - reassign+em;
      """
-    # seqSight_id.seqSight_reassign(True, 0.01, "testset", "sam", outAlignFile_test,
-    #                               "/Users/xinyang/Documents/Github/seqSight/seqSight/Test/TestData",
+    # testcase
+    # BGCLens_id.BGCLens_reassign(True, 0.01, "gene", "sam", outAlignFile_test,
+    #                               "/Users/xinyang/Documents/Github/BGCLens/BGCLens/Test/TestData",
     #                               10, not (False), 0, 0, False, False, emEpsilon=1e-7)
 
 
-    seqSight_id.seqSight_reassign(out_matrix=args.id_out_matrix,
+    BGCLens_id.BGCLens_reassign(out_matrix=args.id_out_matrix,
                                   scoreCutoff=args.id_score_cutoff,
                                   expTag=args.map_exp_tag,
                                   ali_format=args.id_ali_format,
@@ -225,7 +228,7 @@ def main():
 
                                   # output=args.map_outdir,
 
-    # seqSight_id.seqSight_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, output, maxIter,
+    # BGCLens_id.BGCLens_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, output, maxIter,
     # upalign, piPrior, thetaPrior, noCutOff, verbose, emEpsilon=0.01)
 
     return print('Reassign done!')

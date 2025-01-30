@@ -3,8 +3,8 @@
 """
 This code has been adopted from humann DOI: https://doi.org/10.1038/s41592-018-0176-y
 To Run:
-$ python ./seqSight_barplot.py -i1 <input_dir1> -i2 <input_dir2> -title <"name_of_barplot"> -o <barplot>
-$ python ./seqSight_barplot.py -i1 /Users/xinyangzhang/Downloads/bacterial/all5ResultsNum120.tsv -i2 /Users/xinyangzhang/Downloads/bacterial/FiveTargetReads120.tsv -t "life time omics"  -o ./test_barplot.pdf
+$ python ./BGCLens_barplot.py -i1 <input_dir1> -i2 <input_dir2> -title <"name_of_barplot"> -o <barplot>
+$ python ./BGCLens_barplot.py -i1 /Users/xinyangzhang/Downloads/bacterial/all5ResultsNum120.tsv -i2 /Users/xinyangzhang/Downloads/bacterial/FiveTargetReads120.tsv -t "life time omics"  -o ./test_barplot.pdf
 
 """
 import pandas as pd

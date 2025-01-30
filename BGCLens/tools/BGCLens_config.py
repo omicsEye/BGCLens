@@ -1,10 +1,10 @@
 import sys
 
-# # Try to load one of the seqSight src modules to check the installation
+# # Try to load one of the BGCLens src modules to check the installation
 # try:
 #     from .. import check
 # except ImportError:
-#     sys.exit("CRITICAL ERROR: Unable to find the seqSight python package." +
+#     sys.exit("CRITICAL ERROR: Unable to find the BGCLens python package." +
 #              " Please check your install.")
 #
 # # Check the python version
@@ -20,7 +20,7 @@ def parse_arguments(args):
     Parse the arguments from the user
     """
     parser = argparse.ArgumentParser(
-        description="seqSight Configuration\n",
+        description="BGCLens Configuration\n",
         formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
         "--print",
@@ -47,7 +47,7 @@ def main():
     if args.print_config or not args.update:
         # print the current configuration
         current_config_items = config.read_user_edit_config_file()
-        print("seqSight Configuration ( Section : Name = Value )")
+        print("BGCLens Configuration ( Section : Name = Value )")
         for section in current_config_items:
             for name, value in current_config_items[section].items():
                 print(section + " : " + name + " = " + str(value))

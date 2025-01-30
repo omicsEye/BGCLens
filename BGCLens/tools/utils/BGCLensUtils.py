@@ -1,7 +1,7 @@
 
 #!/usr/bin/python
 
-# Some miscellaneous utility functions used by seqSight
+# Some miscellaneous utility functions used by BGCLens
 
 import os
 import zlib

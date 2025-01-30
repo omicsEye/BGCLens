@@ -5,8 +5,8 @@ import sys
 
 version = '1.0.0'
 input_table = ''
-output_folder = '~/Documents/GitHub/seqSight/seqSight/Test'
-basename = 'seqSight'
+output_folder = '~/Documents/GitHub/BGCLens/BGCLens/Test'
+basename = 'BGCLens'
 log_level = 'DEBUG'
 verbose = 'DEBUG'
 nprocesses = 1
@@ -88,7 +88,7 @@ resume = False
 
 # Modify on 07-25-2022 - Xinyang
 
-user_edit_config_file = "seqSight.cfg"
+user_edit_config_file = "BGCLens.cfg"
 
 # print(os.path.abspath(__file__))
 #
@@ -96,7 +96,7 @@ user_edit_config_file = "seqSight.cfg"
 #                                                user_edit_config_file)
 # print(full_path_user_edit_config_file)
 
-full_path_user_edit_config_file = os.path.join(os.path.dirname(os.path.abspath(".")),"seqSight/seqSight",
+full_path_user_edit_config_file = os.path.join(os.path.dirname(os.path.abspath(".")),"BGCLens/BGCLens",
                                                user_edit_config_file)
 print("Full path",full_path_user_edit_config_file)
 
@@ -113,7 +113,7 @@ def update_user_edit_config_file_single_item(section, name, value):
 
     update_user_edit_config_file(new_config_items)
 
-    print("seqSight configuration file updated: " + section + " : " + name + " = " + str(value))
+    print("BGCLens configuration file updated: " + section + " : " + name + " = " + str(value))
 
 
 def update_user_edit_config_file(new_config_items):
@@ -158,7 +158,7 @@ def update_user_edit_config_file(new_config_items):
         config.write(file_handle)
         file_handle.close()
     except EnvironmentError:
-        sys.exit("Unable to write to the seqSight config file.")
+        sys.exit("Unable to write to the BGCLens config file.")
 
 
 def read_user_edit_config_file():
@@ -173,7 +173,7 @@ def read_user_edit_config_file():
     try:
         # print("full_path_user_edit_config_file",full_path_user_edit_config_file)
         config.read(full_path_user_edit_config_file)
-        # config.read("/Users/xinyangzhang/Documents/GitHub/seqSight/seqSight/seqSight.cfg")
+        # config.read("/Users/xinyangzhang/Documents/GitHub/BGCLens/BGCLens/BGCLens.cfg")
 
     except EnvironmentError:
         sys.exit("Unable to read from the config file: " + full_path_user_edit_config_file)

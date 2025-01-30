@@ -1,6 +1,6 @@
 # from __future__ import print_function
 """
-seqSight utilities
+BGCLens utilities
 """
 import re
 import sys
@@ -1569,15 +1569,15 @@ def map_id(seq_file1, seq_file2, ref_database, out_dir, out_align, threads, inde
     make use of the function!!!
     '''
     if seq_file2 is None:
-        cmd = f"seqSight MAP -U {seq_file1} -numThreads {threads} -indexDir {index_dir}" \
+        cmd = f"BGCLens MAP -U {seq_file1} -numThreads {threads} -indexDir {index_dir}" \
               f" -targetIndexPrefixes {ref_database} -outDir {out_dir} -outAlign {out_align}.sam"
     else:
-        cmd = f"seqSight MAP -1 {seq_file1} -2 {seq_file2} -numThreads {threads}" \
+        cmd = f"BGCLens MAP -1 {seq_file1} -2 {seq_file2} -numThreads {threads}" \
               f" -indexDir {index_dir} -targetIndexPrefixes {ref_database} -outDir {out_dir} -outAlign {out_align}.sam"
 
     os.system(cmd)
 
-    cmd = f"seqSight ID -alignFile {os.path.join(out_dir, out_align + '.sam')}" \
+    cmd = f"BGCLens ID -alignFile {os.path.join(out_dir, out_align + '.sam')}" \
           f" -fileType sam -outDir results_ID -expTag {tag}"
     os.system(cmd)
     return 'DONE!!'

@@ -38,20 +38,20 @@ def merge(file_path, outputDirFile):
     # s2.loc["count1"] = s2.count()
 
     # put the path you wish to save the output
-    # s2.to_csv("./seqSight_BGC_All_Results/BGC_Frankel_Merged.tsv")
+    # s2.to_csv("./BGCLens_BGC_All_Results/BGC_Frankel_Merged.tsv")
     s2.to_csv(outputDirFile)
 
     return
 
 
-argp = argparse.ArgumentParser(prog="merge_seqSight_tables.py",
-                               description="Performs a table join on one or more seqSight output files.")
+argp = argparse.ArgumentParser(prog="merge_BGCLens_tables.py",
+                               description="Performs a table join on one or more BGCLens output files.")
 argp.add_argument("--file_path", help="Name of file containing the paths to the files to combine")
 argp.add_argument('--outputDirFile', metavar="output.txt", help="Name of output file containing the path")
 
 argp.usage = (argp.format_usage() + "\nPlease make sure to supply file paths to the files to combine.\n\n" +
               "A wildcard to indicate all .txt files that start with Table can be used as follows:\n" +
-              "    ./merge_seqSight_tables.py Table*.txt > output.txt")
+              "    ./merge_BGCLens_tables.py Table*.txt > output.txt")
 
 
 # def main():
@@ -61,11 +61,11 @@ argp.usage = (argp.format_usage() + "\nPlease make sure to supply file paths to 
 #         args.aistms = [x.strip().split()[0] for x in open(args.l)]
 #
 #     if not args.aistms:
-#         print('merge_seqSight_tables: no inputs to merge!')
+#         print('merge_BGCLens_tables: no inputs to merge!')
 #         return
 #
 #     if args.o and os.path.exists(args.o) and not args.overwrite:
-#         print('merge_seqSight_tables: output file "{}" exists, specify the --overwrite param to ovrewrite it!'.format(
+#         print('merge_BGCLens_tables: output file "{}" exists, specify the --overwrite param to ovrewrite it!'.format(
 #             args.o))
 #         return
 #
@@ -73,7 +73,7 @@ argp.usage = (argp.format_usage() + "\nPlease make sure to supply file paths to 
 
 
 if __name__ == '__main__':
-    file_path = "/Users/xinyang/Library/CloudStorage/Box-Box/Cancer_Mircrobiome/seqSight_BGC_All_Results/BGC_Frankel/"
+    file_path = "/Users/xinyang/Library/CloudStorage/Box-Box/Cancer_Mircrobiome/BGCLens_BGC_All_Results/BGC_Frankel/"
     outputDirFile = "/Users/xinyang/Library/CloudStorage/Box-Box/Cancer_Mircrobiome/BGC_Frankel_MergedTEST.tsv"
     merge(file_path, outputDirFile)
 

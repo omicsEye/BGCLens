@@ -3,10 +3,10 @@
 # TODO: PathoMap performs the alignment through wrappers for each type of aligners.
 
 import os, re, csv, sys
-from seqSight.tools.utils import samUtils
-from seqSight.tools.utils import seqParse
-from seqSight.tools.utils import seqSightUtils
-from seqSight.tools.seqSightReport import xmlReport
+from BGCLens.tools.utils import samUtils
+from BGCLens.tools.utils import seqParse
+from BGCLens.tools.utils import samUtils
+from BGCLens.tools.BGCLensReport import xmlReport
 
 pathoscopedir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, pathoscopedir)
@@ -166,7 +166,7 @@ objective: this is a core def in retrieve_genome_annotation_from_sam. Having tem
 #
 #                     for i in range(C):
 #                         # print '[subgi%s:%d - %d][cov:%d-%d]' % (gi,aStbp,aEdbp,covRange[START][i],covRange[END][i])
-#                         notCoveredA -= seqSightUtils.segments_intersect(aStbp, aEdbp, covRange[i][START],
+#                         notCoveredA -= BGCLensUtils.segments_intersect(aStbp, aEdbp, covRange[i][START],
 #                                                                       covRange[i][END])
 #                         if notCoveredA < minCoveredA2:
 #                             reportA = True
@@ -265,7 +265,7 @@ def selectConsensusContigs(fqRec, minContigLen, kolCompxCutoff):
 
         if kolCompxCutoff > 0:
             subSeq = rSeq[covRanges[0][c]:covRanges[1][c] + 1]
-            kx = seqSightUtils.kolmogorov(subSeq)
+            kx = BGCLensUtils.kolmogorov(subSeq)
             if kx > kolCompxCutoff:
                 covRanges2.append([covRanges[0][c], covRanges[1][c]])
         else:

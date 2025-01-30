@@ -3,7 +3,7 @@
 import os, sys
 
 
-from seqSight.tools.utils import samUtils
+from BGCLens.tools.utils import samUtils
 
 
 # ===========================================================

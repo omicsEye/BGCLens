@@ -1,6 +1,6 @@
 # BGCLens #
 
-**BGCLens** (previously seqSight)is a tool to jointly profile microbial strains, genes, and biosynthetic gene clusters from metagenomics data; it is designed to provided maximum utility to the user by incorporating a number of analysis modules for the quantification of not only bacterial strains but also gene families and biosynthetic gene clusters. BGCLens also incorporates quality control modules and visualization tools.
+**BGCLens** (previously BGCLens)is a tool to jointly profile microbial strains, genes, and biosynthetic gene clusters from metagenomics data; it is designed to provided maximum utility to the user by incorporating a number of analysis modules for the quantification of not only bacterial strains but also gene families and biosynthetic gene clusters. BGCLens also incorporates quality control modules and visualization tools.
  
 ---
 
