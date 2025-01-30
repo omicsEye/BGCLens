@@ -184,10 +184,10 @@ def main():
         exp_tag = args.map_exp_tag
 
     #     filterRefFiles = []
-        targetIndexPrefixes = ["Users/xinyang/Documents/Github/BGCLens/BGCLens/Test/TestData/genomes"]
-        filterIndexPrefixes = []
-        targetAlignFiles = []
-        filterAlignFiles = []
+    #     targetIndexPrefixes = ["Users/xinyang/Documents/Github/BGCLens/BGCLens/Test/TestData/genomes"]
+    #     filterIndexPrefixes = []
+    #     targetAlignFiles = []
+    #     filterAlignFiles = []
     """
     step1 - MAP function;
     Input -  ex1.fastq;
