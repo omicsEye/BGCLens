@@ -202,21 +202,21 @@ def main():
     # seqSight_id.seqSight_reassign(True, 0.01, "testset", "sam", outAlignFile_test,
     #                               "/Users/xinyang/Documents/Github/seqSight/seqSight/Test/TestData",
     #                               10, not (False), 0, 0, False, False, emEpsilon=1e-7)
-    #
-    # seqSight_id.seqSight_reassign(out_matrix=args.id_out_matrix,
-    #                               scoreCutoff=args.id_score_cutoff,
-    #                               expTag=args.map_exp_tag,
-    #                               ali_format=args.id_ali_format,
-    #                               ali_file=outAlignFile_test,
-    #                               output=args.map_outdir,
-    #                               maxIter=args.id_maxIter,
-    #                               upalign=args.id_noalign,
-    #                               piPrior=args.id_piPrior,
-    #                               thetaPrior=args.id_thetaPrior,
-    #                               noCutOff=args.id_nocutoff,
-    #                               verbose=True,
-    #                               emEpsilon=args.id_emEpsilon,
-    #                               output=args.id_reportDir)
+
+
+    seqSight_id.seqSight_reassign(out_matrix=args.id_out_matrix,
+                                  scoreCutoff=args.id_score_cutoff,
+                                  expTag=args.map_exp_tag,
+                                  ali_format=args.id_ali_format,
+                                  ali_file=outAlignFile_test,
+                                  maxIter=args.id_maxIter,
+                                  upalign=args.id_noalign,
+                                  piPrior=args.id_piPrior,
+                                  thetaPrior=args.id_thetaPrior,
+                                  noCutOff=args.id_nocutoff,
+                                  verbose=True,
+                                  emEpsilon=args.id_emEpsilon,
+                                  output=args.id_reportDir)
 
     #                               output=args.map_outdir,
 
