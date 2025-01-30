@@ -118,6 +118,9 @@ def parse_arguments():
                           help='Alignment Format: sam/bl8/gnu-sam (Default: sam)')
     # parser.add_argument('-alignFile', action='store', dest='id_ali_file', required=True,
     #                       help='Alignment file path')
+    parser.add_argument('-reportDir', action='store', default='.',
+                        dest='id_reportDir', required=False,
+                        help='Output dir for the relative abundance report(Default=. (current directory))')
 
     return parser.parse_args()
 
@@ -200,19 +203,20 @@ def main():
     #                               "/Users/xinyang/Documents/Github/seqSight/seqSight/Test/TestData",
     #                               10, not (False), 0, 0, False, False, emEpsilon=1e-7)
     #
-    seqSight_id.seqSight_reassign(out_matrix=args.id_out_matrix,
-                                  scoreCutoff=args.id_score_cutoff,
-                                  expTag=args.map_exp_tag,
-                                  ali_format=args.id_ali_format,
-                                  ali_file=outAlignFile_test,
-                                  output=args.map_outdir,
-                                  maxIter=args.id_maxIter,
-                                  upalign=args.id_noalign,
-                                  piPrior=args.id_piPrior,
-                                  thetaPrior=args.id_thetaPrior,
-                                  noCutOff=args.id_nocutoff,
-                                  verbose=True,
-                                  emEpsilon=args.id_emEpsilon)
+    # seqSight_id.seqSight_reassign(out_matrix=args.id_out_matrix,
+    #                               scoreCutoff=args.id_score_cutoff,
+    #                               expTag=args.map_exp_tag,
+    #                               ali_format=args.id_ali_format,
+    #                               ali_file=outAlignFile_test,
+    #                               output=args.map_outdir,
+    #                               maxIter=args.id_maxIter,
+    #                               upalign=args.id_noalign,
+    #                               piPrior=args.id_piPrior,
+    #                               thetaPrior=args.id_thetaPrior,
+    #                               noCutOff=args.id_nocutoff,
+    #                               verbose=True,
+    #                               emEpsilon=args.id_emEpsilon,
+    #                               reportDir=args.id_reportDir)
 
     # seqSight_id.seqSight_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, output, maxIter,
     # upalign, piPrior, thetaPrior, noCutOff, verbose, emEpsilon=0.01)
