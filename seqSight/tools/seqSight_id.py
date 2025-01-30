@@ -191,7 +191,7 @@ def seqSight_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, out
         csv_writer.writerows(tmp)
         oFp.close()
 
-    finalReport = output + os.sep + filename + expTag + '-' + ali_format + '-reporttesttttttt.tsv'
+    finalReport = output + os.sep + filename + expTag + '-' + ali_format + '-report.tsv'
     header = ['Genome', 'Final Guess', 'Final Best Hit', 'Final Best Hit Read Numbers', \
               'Final High Confidence Hits', 'Final Low Confidence Hits', 'Initial Guess', \
               'Initial Best Hit', 'Initial Best Hit Read Numbers', \
