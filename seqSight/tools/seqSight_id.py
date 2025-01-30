@@ -114,7 +114,7 @@ def conv_align2GRmat(aliDfile, pScoreCutoff, aliFormat):
 # Entry function to seqSightID
 # Does the reassignment and generates a tsv file report
 def seqSight_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, output, maxIter,
-                      upalign, piPrior, thetaPrior, noCutOff, verbose, emEpsilon=0.01):
+                      upalign, piPrior, thetaPrior, noCutOff, verbose, emEpsilon=0.01, filename="Report"):
     print("You are in seqSight_reassign")
 
     if float(os.stat(ali_file).st_size) < 1.0:
@@ -191,7 +191,7 @@ def seqSight_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, out
         csv_writer.writerows(tmp)
         oFp.close()
 
-    finalReport = output + os.sep + expTag + '-' + ali_format + '-reporttesttttttt.tsv'
+    finalReport = output + filename + os.sep + expTag + '-' + ali_format + '-reporttesttttttt.tsv'
     header = ['Genome', 'Final Guess', 'Final Best Hit', 'Final Best Hit Read Numbers', \
               'Final High Confidence Hits', 'Final Low Confidence Hits', 'Initial Guess', \
               'Initial Best Hit', 'Initial Best Hit Read Numbers', \
