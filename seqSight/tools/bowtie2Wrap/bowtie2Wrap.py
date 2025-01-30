@@ -2,6 +2,7 @@
 
 import os, sys
 
+
 from seqSight.tools.utils import samUtils
 
 
@@ -19,7 +20,7 @@ class Bowtie2Options:
     readFilePair1 = ""
     readFilePair2 = ""
     outAlignFile = ""
-    outDir = "."
+    outDir = ""  # previous:"."
     indexDir = "."
     numThreads = 8
     additionalOptions = "--very-sensitive-local -k 100 --score-min L,20,1.0"#DEFAULT_OPTION
@@ -43,8 +44,15 @@ def run_bowtie2(bowtie2Options):
     #     print(bowtie2Options.btHome)
     #     btBinPath = bowtie2Options.btHome + os.sep + bowtie2Options.btBin
     #     print("2btBinPath", btBinPath)
-    outAlignFilePath = bowtie2Options.outDir + os.sep + bowtie2Options.outAlignFile
+    print("bowtie2Options.outDir", bowtie2Options.outDir)
+    print("bowtie2Options.outAlignFile",bowtie2Options.outAlignFile)
+    # latest
+    outAlignFilePath = bowtie2Options.outAlignFile
+    # previous
+    # outAlignFilePath = bowtie2Options.outDir + os.sep + bowtie2Options.outAlignFile
+    print("outAlignFilePath", outAlignFilePath)
     print("bowtie2Options.DEFAULT_OPTION", bowtie2Options.DEFAULT_OPTION)
+    print("btIndexPrefix",bowtie2Options.btIndexPrefix)
     if bowtie2Options.bothReadFlag:  # newly added
         cmd = "%s -x %s -1 %s -2 %s -U %s -p %s %s -S %s" % (btBinPath,
                                                              bowtie2Options.btIndexPrefix,
