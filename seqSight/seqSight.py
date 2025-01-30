@@ -119,8 +119,12 @@ def parse_arguments():
     # parser.add_argument('-alignFile', action='store', dest='id_ali_file', required=True,
     #                       help='Alignment file path')
     parser.add_argument('-reportDir', action='store', default='.',
-                        dest='id_reportDir', required=False,
+                        dest='id_reportDir', required=True,
                         help='Output dir for the relative abundance report(Default=. (current directory))')
+
+    parser.add_argument('-filename', action='store', default='Report',
+                        dest='id_filename', required=False,
+                        help='Relative abundance table name')
 
     return parser.parse_args()
 
@@ -216,9 +220,10 @@ def main():
                                   noCutOff=args.id_nocutoff,
                                   verbose=True,
                                   emEpsilon=args.id_emEpsilon,
-                                  output=args.id_reportDir)
+                                  output=args.id_reportDir,
+                                  filename=args.id_filename)
 
-    #                               output=args.map_outdir,
+                                  # output=args.map_outdir,
 
     # seqSight_id.seqSight_reassign(out_matrix, scoreCutoff, expTag, ali_format, ali_file, output, maxIter,
     # upalign, piPrior, thetaPrior, noCutOff, verbose, emEpsilon=0.01)
