@@ -7,7 +7,7 @@ import sys
 import argparse
 
 from BGCLens.tools.BGCLensReport import BGCLensReport
-from BGCLens.tools.utils import samUtils, samUtils
+from BGCLens.tools.utils import BGCLensUtils, samUtils
 
 
 def conv_align2GRmat(aliDfile, pScoreCutoff, aliFormat):

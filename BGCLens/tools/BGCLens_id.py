@@ -10,7 +10,7 @@ import sys
 import argparse
 
 from BGCLens.tools.BGCLensReport import BGCLensReport
-from BGCLens.tools.utils import samUtils, samUtils
+from BGCLens.tools.utils import BGCLensUtils, samUtils
 from time import time
 
 
